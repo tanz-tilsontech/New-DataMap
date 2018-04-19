@@ -668,9 +668,6 @@ var highlightLayer = L.geoJson(null, {
 
 
 var featureLayer = L.geoJson(null, {
-  filter: function(feature, layer) {
-    if (feature.properties.contractor != "Tilson") return true;
-  },
   pointToLayer: function (feature, latlng) {
     return L.marker(latlng, {
       title: feature.properties["status_title_github"],
