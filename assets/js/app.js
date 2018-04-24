@@ -671,21 +671,21 @@ var highlightLayer = L.geoJson(null, {
 });
 
 
-var owner = ["tanneranz@gmail.com"];
-var customer =[];
-var contractor = ["test@test.com","test@gmail.com"];
+var owner = ["tilson"];
+var customer =["verizon"];
+var contractor1 = ["fibertel"];
 
 var featureLayer = L.geoJson(null, {
   filter: function(feature, layer) {
 	
 	  	if($.inArray(sessionStorage.getItem('fulcrum_useremail'),owner) != -1){
-			if (feature.properties.contractor == "Tilson") return true;
+			if (feature.properties.contractor != "") return true;
 		}
 		else if($.inArray(sessionStorage.getItem('fulcrum_useremail'),customer) != -1){
 			if (feature.properties.contractor != "") return true;
 		}
-		else if($.inArray(sessionStorage.getItem('fulcrum_useremail'),contractor) != -1){
-			if (feature.properties.contractor != "") return true;
+		else if($.inArray(sessionStorage.getItem('fulcrum_useremail'),contractor1) != -1){
+			if (feature.properties.contractor.includes(contractor1)) return true;
 		}
   },
   /* filter: function(feature, layer) {
