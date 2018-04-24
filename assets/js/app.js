@@ -5,10 +5,11 @@ bindUIActions();
 
 
 function bindUIActions() {
+	
   $("#login-btn").click(function() {
     login();
   });
-
+  
   $("#login-modal").on("shown.bs.modal", function (e) {
     $(".modal-backdrop").css("opacity", "1");
   });
@@ -16,6 +17,8 @@ function bindUIActions() {
   $("#login-modal").on("hidden.bs.modal", function (e) {
     $(".modal-backdrop").css("opacity", "");
   });
+  
+  
 };
 
 function checkAuth() {
@@ -46,16 +49,17 @@ function login() {
     },
     success: function (data) {
       $.each(data.user.contexts, function(index, context) {
-        if (context.name == "Tilson SLC") {
+       // if (context.name == "Tilson SLC") {
           sessionStorage.setItem("fulcrum_app_token", btoa(context.api_token));
           sessionStorage.setItem("fulcrum_userfullname", data.user.first_name + " " + data.user.last_name);
           sessionStorage.setItem("fulcrum_useremail", data.user.email);
-        }
+       // }
       });
       if (!sessionStorage.getItem("fulcrum_app_token")) {
         alert("This login does not have access to the Tilson DataMap.");
       }
-      checkAuth();
+		checkAuth();
+	  	window.location.reload();
     }
   });
 };
@@ -667,7 +671,26 @@ var highlightLayer = L.geoJson(null, {
 });
 
 
+var owner = ["tanneranz@gmail.com"];
+var customer =[];
+var contractor = ["test@test.com","test@gmail.com"];
+
 var featureLayer = L.geoJson(null, {
+  filter: function(feature, layer) {
+	
+	  	if($.inArray(sessionStorage.getItem('fulcrum_useremail'),owner) != -1){
+			if (feature.properties.contractor == "Tilson") return true;
+		}
+		else if($.inArray(sessionStorage.getItem('fulcrum_useremail'),customer) != -1){
+			if (feature.properties.contractor != "") return true;
+		}
+		else if($.inArray(sessionStorage.getItem('fulcrum_useremail'),contractor) != -1){
+			if (feature.properties.contractor != "") return true;
+		}
+  },
+  /* filter: function(feature, layer) {
+    if (feature.properties.contractor != "Tilson") return true;
+  }, */
   pointToLayer: function (feature, latlng) {
     return L.marker(latlng, {
       title: feature.properties["status_title_github"],
@@ -765,47 +788,48 @@ var featureLayer1 = L.geoJson(null, {
 
 
 
+		// Fetch the Routes GeoJSON file
+		$.getJSON(config.geojson, function (data) {
+		  geojson = data;
 
-// Fetch the Routes GeoJSON file
+			features = $.map(geojson.features, function(feature) {
+				return feature.properties;
+			});
 
-$.getJSON(config.geojson, function (data) {
-  geojson = data;
-  features = $.map(geojson.features, function(feature) {
-    return feature.properties;
-  });
-  featureLayer.addData(data);
-  buildConfig();
-  $("#loading-mask").hide();
-  var style = {
-    "property": "status",
-    "values": {
-      "Segment Ready": "https://image.ibb.co/iXHCyH/1891c9.png",
-      "Segment Not Ready": "https://image.ibb.co/hk21sc/242424.png",
-      "Construction Started": "https://image.ibb.co/mC5Akx/ffd300.png",
-      "Constractor CX QC": "https://image.ibb.co/hHRSXc/b3b3b3.png",
-      "Tilson CX QC": "https://image.ibb.co/c3TVkx/ff8819.png",
-      "Construction Fix": "https://image.ibb.co/cen1sc/cb0d0c.png",
-      "Cable Placement Ready": "https://image.ibb.co/iXHCyH/1891c9.png",
-      "Cable Placement Started": "https://image.ibb.co/mC5Akx/ffd300.png",
-      "Contractor CP QC": "https://image.ibb.co/hHRSXc/b3b3b3.png",
-      "Tilson CP QC": "https://image.ibb.co/c3TVkx/ff8819.png",
-      "Cable Placement Fix": "https://image.ibb.co/cen1sc/cb0d0c.png",
-      "Splicing/Testing Pending": "https://image.ibb.co/hxOkJH/87d30f.png"
-    }
-  }
-  JSON.stringify(style);
-  if (style.property && style.values) {
-    $("#legend-item").removeClass("hidden");
-    $("#legend-title").html(style.property.toUpperCase().replace(/_/g, " "));
-    $.each(style.values, function(property, value) {
-      if (value.startsWith("http")) {
-        $("#legend").append("<p><img src='" + value + "'></i> " + property + "</p>");
-      } else {
-        $("#legend").append("<p><i style='background:" + value + "'></i> " + property + "</p>");
-      }
-    });
-  }
-});
+			featureLayer.addData(data);
+			buildConfig();
+		  $("#loading-mask").hide();
+		  var style = {
+			"property": "status",
+			"values": {
+			  "Segment Ready": "https://image.ibb.co/iXHCyH/1891c9.png",
+			  "Segment Not Ready": "https://image.ibb.co/hk21sc/242424.png",
+			  "Construction Started": "https://image.ibb.co/mC5Akx/ffd300.png",
+			  "Constractor CX QC": "https://image.ibb.co/hHRSXc/b3b3b3.png",
+			  "Tilson CX QC": "https://image.ibb.co/c3TVkx/ff8819.png",
+			  "Construction Fix": "https://image.ibb.co/cen1sc/cb0d0c.png",
+			  "Cable Placement Ready": "https://image.ibb.co/iXHCyH/1891c9.png",
+			  "Cable Placement Started": "https://image.ibb.co/mC5Akx/ffd300.png",
+			  "Contractor CP QC": "https://image.ibb.co/hHRSXc/b3b3b3.png",
+			  "Tilson CP QC": "https://image.ibb.co/c3TVkx/ff8819.png",
+			  "Cable Placement Fix": "https://image.ibb.co/cen1sc/cb0d0c.png",
+			  "Splicing/Testing Pending": "https://image.ibb.co/hxOkJH/87d30f.png"
+			}
+		  }
+		  JSON.stringify(style);
+		  if (style.property && style.values) {
+			$("#legend-item").removeClass("hidden");
+			$("#legend-title").html(style.property.toUpperCase().replace(/_/g, " "));
+			$.each(style.values, function(property, value) {
+			  if (value.startsWith("http")) {
+				$("#legend").append("<p><img src='" + value + "'></i> " + property + "</p>");
+			  } else {
+				$("#legend").append("<p><i style='background:" + value + "'></i> " + property + "</p>");
+			  }
+			});
+		  } 
+		});
+
 
 
 // Fetch the Restoration GeoJSON file
@@ -827,9 +851,9 @@ var map = L.map("map", {
 
 
 // ESRI geocoder
-var searchControl = L.esri.Geocoding.Controls.geosearch({
+/* var searchControl = L.esri.Geocoding.Controls.geosearch({
   useMapBounds: 17
-}).addTo(map);
+}).addTo(map); */
 
 // Info control
 var info = L.control({
@@ -927,16 +951,27 @@ $('#query-builder').queryBuilder({
 
 
 function applyFilter() {
+
   var query = "SELECT * FROM ?";
   var sql = $("#query-builder").queryBuilder("getSQL", false, false).sql;
   if (sql.length > 0) {
     query += " WHERE " + sql;
   }
-  alasql(query, [geojson.features], function(features){
-    featureLayer.clearLayers();
-    featureLayer.addData(features);
-    syncTable();
-  });
+
+		
+	$.getJSON(config.geojson, function (data) {/* get filtered location */
+		  geojson = data;
+
+			features = $.map(geojson.features, function(feature) {
+				return feature.properties;
+			});
+				/* featureLayer.addData(data); */
+		alasql(query, [geojson.features], function(features){
+			featureLayer.clearLayers(); 
+			featureLayer.addData(features);  
+		syncTable(); 
+	  }); 
+    });
 }
 
 function buildTable() {
