@@ -676,21 +676,6 @@ var customer =["verizon"];
 var contractor1 = ["fibertel"];
 
 var featureLayer = L.geoJson(null, {
-  filter: function(feature, layer) {
-	
-	  	if($.inArray(sessionStorage.getItem('fulcrum_useremail'),owner) != -1){
-			if (feature.properties.contractor != "") return true;
-		}
-		else if($.inArray(sessionStorage.getItem('fulcrum_useremail'),customer) != -1){
-			if (feature.properties.contractor != "") return true;
-		}
-		else if($.inArray(sessionStorage.getItem('fulcrum_useremail'),contractor1) != -1){
-			if (feature.properties.contractor.includes(contractor1)) return true;
-		}
-  },
-  /* filter: function(feature, layer) {
-    if (feature.properties.contractor != "Tilson") return true;
-  }, */
   pointToLayer: function (feature, latlng) {
     return L.marker(latlng, {
       title: feature.properties["status_title_github"],
